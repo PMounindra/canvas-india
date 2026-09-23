@@ -504,6 +504,12 @@ const FONT_OPTIONS = [
 
 const TEXT_COLORS = ['#FFFFFF', '#000000', '#D4AF37', '#0E4A93', '#E8752A', '#DC2626', '#059669', '#7C3AED'];
 
+const getFilterCss = (filter?: string): string => {
+  if (filter === 'sepia') return 'sepia(0.8) contrast(1.05)';
+  if (filter === 'grayscale') return 'grayscale(1) contrast(1.1)';
+  return 'none';
+};
+
 interface TextItem {
   id: string;
   text: string;

@@ -41,9 +41,18 @@ export class ErrorBoundary extends Component<Props, State> {
             <h2 className="text-xl font-black text-stone-900 mb-2">
               {this.props.fallbackTitle || 'Customizer Error Occurred'}
             </h2>
-            <p className="text-sm text-stone-600 mb-6 leading-relaxed">
-              We encountered an issue processing the image or rendering the studio preview. Please reload to reset your customizer session.
+            <p className="text-sm text-stone-600 mb-4 leading-relaxed">
+              We encountered an issue processing the image or rendering the studio preview.
             </p>
+
+            {this.state.error && (
+              <div className="w-full text-left bg-stone-100 p-3 rounded-lg mb-4 text-xs font-mono text-stone-800 overflow-x-auto max-h-40 border border-stone-200">
+                <div className="font-bold text-rose-700 mb-1">{this.state.error.name}: {this.state.error.message}</div>
+                {this.state.error.stack && (
+                  <pre className="text-[10px] text-stone-600 whitespace-pre-wrap font-mono">{this.state.error.stack}</pre>
+                )}
+              </div>
+            )}
             <button
               type="button"
               onClick={this.handleReset}
