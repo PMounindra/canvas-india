@@ -17,7 +17,10 @@ import {
   ArrowRight,
   PackageCheck,
   Info,
-  Zap
+  Zap,
+  Upload,
+  Type,
+  Check
 } from 'lucide-react';
 import { Product } from '../types';
 import { useShop } from '../context/ShopContext';
@@ -72,8 +75,24 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
   const [selectedThickness, setSelectedThickness] = useState<string>(availableThicknesses[0]);
   const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0]);
   const [selectedPaper, setSelectedPaper] = useState<string>(availablePapers[0]);
-  const [selectedBase, setSelectedBase] = useState<string>(availableBases[0]);
   const [quantity, setQuantity] = useState<number>(1);
+
+  // Photo Upload & Custom Text state
+  const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
+  const [customText, setCustomText] = useState<string>('');
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setUploadedFile(event.target?.result as string);
+        setUploadSuccess(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Bottom Tabs State ('description' | 'specifications' | 'shipping' | 'reviews')
   const [activeTab, setActiveTab] = useState<'description' | 'specifications' | 'shipping' | 'reviews'>('description');
@@ -288,11 +307,31 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
             <div className="relative aspect-[4/3] bg-stone-100 rounded-3xl overflow-hidden border border-stone-200 shadow-md group">
               
               <ProductImage
-                src={galleryImages[activeImageIndex] || product.image}
+                src={uploadedFile || galleryImages[activeImageIndex] || product.image}
                 alt={product.name}
                 category="acrylic"
                 className="w-full h-full object-cover transition-all duration-300"
               />
+
+              {/* Live custom text preview on the product image */}
+              {customText.trim() && (
+                <div className="pointer-events-none absolute inset-x-6 top-1/2 -translate-y-1/2 text-center z-10">
+                  <span
+                    className="inline-block max-w-full break-words text-white text-xl sm:text-3xl font-bold leading-tight"
+                    style={{ fontFamily: 'Georgia, "Times New Roman", serif', fontStyle: 'italic', textShadow: '0 2px 10px rgba(0,0,0,0.65), 0 0 2px rgba(0,0,0,0.6)' }}
+                  >
+                    {customText}
+                  </span>
+                </div>
+              )}
+
+              {/* Uploaded User Photo Indicator Overlay */}
+              {uploadedFile && (
+                <div className="absolute top-4 left-4 z-10 bg-[#0E4A93] text-white text-[10px] font-bold px-2.5 py-1 rounded-md shadow-sm flex items-center gap-1">
+                  <Check className="w-3 h-3 text-emerald-400" />
+                  <span>Custom Artwork Applied</span>
+                </div>
+              )}
 
               {/* Acrylic Gloss Glass Sheen Effect Overlay */}
               <div className="absolute inset-0 bg-gradient-to-tr from-white/0 via-white/10 to-transparent pointer-events-none" />
@@ -448,134 +487,235 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
               {product.shortDescription || 'Personalized Acrylic Photo Blocks provide a clean, modern display for photographs and artwork, featuring crystal-clear cast acrylic, diamond-polished beveled edges, and an immersive dimensional appearance.'}
             </p>
 
-            {/* =================================================================== */}
-            {/* PRODUCT CONFIGURATION SELECTORS                                     */}
-            {/* =================================================================== */}
-            <div className="space-y-4 pt-2 border-t border-stone-200">
-              
-              {/* 1. SELECT STYLE */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-stone-700 sm:col-span-1">
-                  Select Style:
-                </label>
-                <div className="sm:col-span-2">
-                  <select
-                    value={selectedStyle}
-                    onChange={(e) => setSelectedStyle(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:border-[#0E4A93] cursor-pointer shadow-2xs"
-                  >
-                    {availableStyles.map((style) => (
-                      <option key={style} value={style}>{style}</option>
-                    ))}
-                  </select>
+            {/* ========================================================================= */}
+            {/* PROMINENT "CUSTOMIZE YOUR PRODUCT" WORKFLOW                               */}
+            {/* ========================================================================= */}
+            <div className="p-4 rounded-xl bg-orange-50/70 border border-orange-200/80 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="text-xs font-black uppercase tracking-wider text-[#E8752A] flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#E8752A]" />
+                  <span>Customize Your Product</span>
+                </div>
+                <span className="text-[10px] font-bold bg-[#E8752A] text-white px-2 py-0.5 rounded-full">
+                  Step-by-Step
+                </span>
+              </div>
+
+              {/* Step Visual List */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-xs text-stone-700 font-medium">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#0E4A93] font-bold text-[11px] flex items-center justify-center border border-orange-200 shrink-0">1</span>
+                  <span>Select Size</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#0E4A93] font-bold text-[11px] flex items-center justify-center border border-orange-200 shrink-0">2</span>
+                  <span>Select Style</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#0E4A93] font-bold text-[11px] flex items-center justify-center border border-orange-200 shrink-0">3</span>
+                  <span>Select Thickness</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#0E4A93] font-bold text-[11px] flex items-center justify-center border border-orange-200 shrink-0">4</span>
+                  <span>Upload Your Design</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#0E4A93] font-bold text-[11px] flex items-center justify-center border border-orange-200 shrink-0">5</span>
+                  <span>Add Custom Text</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-5 h-5 rounded-full bg-white text-[#0E4A93] font-bold text-[11px] flex items-center justify-center border border-orange-200 shrink-0">6</span>
+                  <span>Choose Quantity</span>
                 </div>
               </div>
 
-              {/* 2. SELECT THICKNESS */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-stone-700 sm:col-span-1">
-                  Select Thickness:
-                </label>
-                <div className="sm:col-span-2">
-                  <select
-                    value={selectedThickness}
-                    onChange={(e) => setSelectedThickness(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:border-[#0E4A93] cursor-pointer shadow-2xs"
-                  >
-                    {availableThicknesses.map((th) => (
-                      <option key={th} value={th}>{th}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* 3. SELECT SIZE */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-stone-700 sm:col-span-1">
-                  Select Size:
-                </label>
-                <div className="sm:col-span-2">
-                  <select
-                    value={selectedSize}
-                    onChange={(e) => setSelectedSize(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:border-[#0E4A93] cursor-pointer shadow-2xs"
-                  >
-                    {availableSizes.map((size) => (
-                      <option key={size} value={size}>{size}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* 4. SELECT PAPER */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-stone-700 sm:col-span-1">
-                  Select Paper:
-                </label>
-                <div className="sm:col-span-2">
-                  <select
-                    value={selectedPaper}
-                    onChange={(e) => setSelectedPaper(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:border-[#0E4A93] cursor-pointer shadow-2xs"
-                  >
-                    {availablePapers.map((paper) => (
-                      <option key={paper} value={paper}>{paper}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* 5. SELECT BASE */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2">
-                <label className="text-xs font-bold text-stone-700 sm:col-span-1">
-                  Select Base:
-                </label>
-                <div className="sm:col-span-2">
-                  <select
-                    value={selectedBase}
-                    onChange={(e) => setSelectedBase(e.target.value)}
-                    className="w-full px-3 py-2 bg-white border border-stone-300 rounded-xl text-xs font-bold text-stone-900 focus:outline-none focus:border-[#0E4A93] cursor-pointer shadow-2xs"
-                  >
-                    {availableBases.map((base) => (
-                      <option key={base} value={base}>{base}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              {/* 6. QUANTITY SELECTOR */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 items-center gap-2 pt-1">
-                <label className="text-xs font-bold text-stone-700 sm:col-span-1">
-                  Quantity:
-                </label>
-                <div className="sm:col-span-2 flex items-center gap-3">
-                  <div className="inline-flex items-center border border-stone-300 rounded-xl bg-white shadow-2xs">
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
-                      className="px-3 py-1.5 text-stone-600 hover:text-stone-900 font-black cursor-pointer transition-colors"
-                      aria-label="Decrease quantity"
-                    >
-                      −
-                    </button>
-                    <span className="px-3 py-1.5 text-xs font-bold text-stone-900 min-w-[28px] text-center">
-                      {quantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setQuantity((prev) => prev + 1)}
-                      className="px-3 py-1.5 text-stone-600 hover:text-stone-900 font-black cursor-pointer transition-colors"
-                      aria-label="Increase quantity"
-                    >
-                      +
-                    </button>
+              {/* Upload & Custom Text In-Page Inputs */}
+              <div className="pt-2 border-t border-orange-200/60 space-y-2.5">
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-800 mb-1 flex items-center gap-1">
+                    <Upload className="w-3 h-3 text-[#E8752A]" />
+                    <span>4. Upload Your Photo or Artwork:</span>
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <label className="flex-1 px-3 py-2 bg-white border border-stone-300 rounded-lg text-xs text-stone-600 hover:border-[#0E4A93] cursor-pointer flex items-center justify-between">
+                      <span className="truncate">{uploadSuccess ? 'Photo attached successfully!' : 'Choose JPG, PNG or WebP file...'}</span>
+                      <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                      <span className="px-2 py-0.5 bg-stone-100 text-[10px] font-bold rounded">Browse</span>
+                    </label>
+                    {uploadSuccess && (
+                      <button 
+                        type="button" 
+                        onClick={() => { setUploadedFile(null); setUploadSuccess(false); }}
+                        className="text-[11px] text-rose-600 hover:underline cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
                   </div>
-                  <span className="text-xs text-stone-500">
-                    Total: <strong className="text-stone-900">₹{totalDiscountedPrice.toLocaleString('en-IN')}</strong>
-                  </span>
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-bold text-stone-800 mb-1 flex items-center gap-1">
+                    <Type className="w-3 h-3 text-[#E8752A]" />
+                    <span>5. Add Custom Text (e.g. Names, Date, Mantra):</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    placeholder="Optional text to print on product..."
+                    className="w-full px-3 py-1.5 text-xs bg-white rounded-lg border border-stone-300 focus:outline-none focus:border-[#0E4A93]"
+                  />
                 </div>
               </div>
+            </div>
 
+            {/* 1. Available Sizes (Pill Buttons) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-stone-800">1. Available Sizes:</span>
+                <span className="text-stone-500 font-medium">{selectedSize}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {availableSizes.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => setSelectedSize(size)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      selectedSize === size
+                        ? 'border-[#0E4A93] bg-blue-50/60 text-[#0E4A93] shadow-2xs'
+                        : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400'
+                    }`}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 2. Select Style (Pill Buttons) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-stone-800">2. Select Style:</span>
+                <span className="text-stone-500 font-medium">{selectedStyle}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {availableStyles.map((style) => (
+                  <button
+                    key={style}
+                    type="button"
+                    onClick={() => setSelectedStyle(style)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      selectedStyle === style
+                        ? 'border-[#0E4A93] bg-blue-50/60 text-[#0E4A93] shadow-2xs'
+                        : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400'
+                    }`}
+                  >
+                    {style}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 3. Select Thickness (Pill Buttons) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-bold text-stone-800">3. Select Thickness:</span>
+                <span className="text-stone-500 font-medium">{selectedThickness}</span>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {availableThicknesses.map((th) => (
+                  <button
+                    key={th}
+                    type="button"
+                    onClick={() => setSelectedThickness(th)}
+                    className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                      selectedThickness === th
+                        ? 'border-[#0E4A93] bg-blue-50/60 text-[#0E4A93] shadow-2xs'
+                        : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400'
+                    }`}
+                  >
+                    {th}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. Select Paper (Pill Buttons) */}
+            {availablePapers.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-stone-800">4. Select Paper:</span>
+                  <span className="text-stone-500 font-medium">{selectedPaper}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {availablePapers.map((paper) => (
+                    <button
+                      key={paper}
+                      type="button"
+                      onClick={() => setSelectedPaper(paper)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                        selectedPaper === paper
+                          ? 'border-[#0E4A93] bg-blue-50/60 text-[#0E4A93] shadow-2xs'
+                          : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400'
+                      }`}
+                    >
+                      {paper}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 5. Select Base (Pill Buttons) */}
+            {availableBases.length > 0 && (
+              <div className="space-y-2">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="font-bold text-stone-800">5. Select Base:</span>
+                  <span className="text-stone-500 font-medium">{selectedBase}</span>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {availableBases.map((base) => (
+                    <button
+                      key={base}
+                      type="button"
+                      onClick={() => setSelectedBase(base)}
+                      className={`px-3 py-1.5 text-xs font-semibold rounded-lg border transition-all cursor-pointer ${
+                        selectedBase === base
+                          ? 'border-[#0E4A93] bg-blue-50/60 text-[#0E4A93] shadow-2xs'
+                          : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400'
+                      }`}
+                    >
+                      {base}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* 6. Quantity Selector */}
+            <div className="flex items-center gap-4 pt-1">
+              <span className="font-bold text-xs text-stone-800">6. Quantity:</span>
+              <div className="inline-flex items-center border border-stone-200 rounded-lg bg-white overflow-hidden shadow-2xs">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                  className="w-8 h-8 flex items-center justify-center text-stone-600 hover:bg-stone-100 font-bold transition-colors cursor-pointer"
+                  aria-label="Decrease quantity"
+                >
+                  -
+                </button>
+                <span className="w-10 text-center text-xs font-extrabold text-stone-900">{quantity}</span>
+                <button
+                  type="button"
+                  onClick={() => setQuantity((prev) => prev + 1)}
+                  className="w-8 h-8 flex items-center justify-center text-stone-600 hover:bg-stone-100 font-bold transition-colors cursor-pointer"
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
             </div>
 
             {/* =================================================================== */}
