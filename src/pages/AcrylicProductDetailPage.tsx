@@ -16,7 +16,8 @@ import {
   SlidersHorizontal,
   ArrowRight,
   PackageCheck,
-  Info
+  Info,
+  Zap
 } from 'lucide-react';
 import { Product } from '../types';
 import { useShop } from '../context/ShopContext';
@@ -240,6 +241,11 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
       qty: quantity.toString(),
     });
     navigate(`/customize/acrylic/${product.slug || product.id}?${params.toString()}`);
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
+    navigate('/checkout');
   };
 
   return (
@@ -573,28 +579,28 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
             </div>
 
             {/* =================================================================== */}
-            {/* TWO PRIMARY ACTIONS: [ CUSTOMIZE ] & [ ADD TO CART ]                */}
+            {/* TWO PRIMARY ACTIONS: [ ADD TO CART ] & [ BUY NOW ]                  */}
             {/* =================================================================== */}
             <div className="pt-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* 1. CUSTOMIZE BUTTON */}
-                <button
-                  type="button"
-                  onClick={handleOpenCustomizer}
-                  className="w-full py-3.5 px-4 bg-[#0E4A93] hover:bg-[#09356A] active:scale-[0.99] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4 text-amber-300" />
-                  <span>CUSTOMIZE</span>
-                </button>
-
-                {/* 2. ADD TO CART BUTTON */}
+                {/* 1. ADD TO CART BUTTON */}
                 <button
                   type="button"
                   onClick={handleAddToCart}
-                  className="w-full py-3.5 px-4 bg-[#E8752A] hover:bg-[#d6651d] active:scale-[0.99] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide transition-all cursor-pointer"
+                  className="w-full py-3.5 px-4 bg-[#0E4A93] hover:bg-[#09356A] active:scale-[0.99] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide transition-all cursor-pointer uppercase"
                 >
                   <ShoppingCart className="w-4 h-4 text-white" />
                   <span>ADD TO CART</span>
+                </button>
+
+                {/* 2. BUY NOW BUTTON */}
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  className="w-full py-3.5 px-4 bg-[#E8752A] hover:bg-[#d6651d] active:scale-[0.99] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide transition-all cursor-pointer uppercase"
+                >
+                  <Zap className="w-4 h-4 text-amber-200 fill-amber-200" />
+                  <span>BUY NOW</span>
                 </button>
               </div>
 
