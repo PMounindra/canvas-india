@@ -18,7 +18,9 @@ import {
   Layers,
   Sliders,
   Type,
-  Maximize2
+  Maximize2,
+  Zap,
+  ShoppingCart
 } from 'lucide-react';
 import { useShop } from '../context/ShopContext';
 import { ProductCard } from '../components/ProductCard';
@@ -673,24 +675,39 @@ export const ProductDetailPage: React.FC = () => {
             </div>
 
             {/* Action CTAs: Add to Cart & Buy Now */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleAddToCartWithVariants}
-                className="flex-1 py-3.5 px-6 rounded-xl bg-[#E8752A] hover:bg-[#D3631A] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-              >
-                <ShoppingBag className="w-4 h-4" />
-                <span>7. Add to Cart</span>
-              </button>
+            <div className="pt-2 space-y-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* 1. ADD TO CART BUTTON */}
+                <button
+                  type="button"
+                  onClick={handleAddToCartWithVariants}
+                  className="w-full py-3.5 px-4 bg-[#0E4A93] hover:bg-[#09356A] active:scale-[0.99] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide transition-all cursor-pointer uppercase"
+                >
+                  <ShoppingCart className="w-4 h-4 text-white" />
+                  <span>ADD TO CART</span>
+                </button>
 
-              <button
-                type="button"
-                onClick={handleBuyNow}
-                className="flex-1 py-3.5 px-6 rounded-xl bg-[#0E4A93] hover:bg-[#09356A] text-white font-bold text-sm flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer"
-              >
-                <span>Buy Now</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
+                {/* 2. BUY NOW BUTTON */}
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  className="w-full py-3.5 px-4 bg-[#E8752A] hover:bg-[#d6651d] active:scale-[0.99] text-white text-xs font-black rounded-xl shadow-md hover:shadow-lg flex items-center justify-center gap-2 tracking-wide transition-all cursor-pointer uppercase"
+                >
+                  <Zap className="w-4 h-4 text-amber-200 fill-amber-200" />
+                  <span>BUY NOW</span>
+                </button>
+              </div>
+
+              <div className="flex items-center justify-center gap-4 text-[11px] text-stone-500 pt-1">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>100% Quality Guaranteed</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <Truck className="w-3.5 h-3.5 text-[#0E4A93]" />
+                  <span>Free Pan-India Delivery &gt;₹999</span>
+                </span>
+              </div>
             </div>
 
             {/* Indian Delivery Check Section */}
