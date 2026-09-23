@@ -1,6 +1,7 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate, Link } from 'react-router-dom';
 import QRCode from 'qrcode';
+import { optimizeImageFile } from '../utils/imageOptimizer';
 import { 
   Menu,
   X, 
@@ -512,7 +513,8 @@ export const AcrylicCustomizerPage: React.FC = () => {
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/upload-session/${uploadSessionId}`);
-        if (res.ok) {
+        const contentType = res.headers.get('content-type') || '';
+        if (res.ok && contentType.includes('application/json')) {
           const data = await res.json();
           if (data.images && Array.isArray(data.images) && data.images.length > 0) {
             for (const img of data.images) {
@@ -625,7 +627,7 @@ export const AcrylicCustomizerPage: React.FC = () => {
   };
 
   // Single file picker change
-  const handleSingleFileChange = (file: File | null, explicitPanelIdx?: number) => {
+  const handleSingleFileChange = async (file: File | null, explicitPanelIdx?: number) => {
     if (!file) return;
     const targetIdx = explicitPanelIdx !== undefined ? explicitPanelIdx : uploadTargetPanelRef.current;
 
@@ -634,9 +636,8 @@ export const AcrylicCustomizerPage: React.FC = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const result = e.target?.result as string;
+    try {
+      const result = await optimizeImageFile(file);
       if (result) {
         const img = new Image();
         img.onload = () => {
@@ -679,8 +680,9 @@ export const AcrylicCustomizerPage: React.FC = () => {
         };
         img.src = result;
       }
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('Failed to optimize image file:', err);
+    }
   };
 
   // Multiple files upload to session gallery

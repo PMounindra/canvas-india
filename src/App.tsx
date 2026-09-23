@@ -37,15 +37,31 @@ import { OrderDetailPage } from './pages/OrderDetailPage';
 import { CheckoutPage } from './pages/CheckoutPage';
 import { OrderSuccessPage } from './pages/OrderSuccessPage';
 
+import { ErrorBoundary } from './components/ErrorBoundary';
+
 export function App() {
   return (
     <AuthProvider>
       <ShopProvider>
         <Routes>
           {/* Dedicated Full-Screen Acrylic Customizer */}
-          <Route path="/customize/acrylic/:productId" element={<AcrylicCustomizerPage />} />
+          <Route
+            path="/customize/acrylic/:productId"
+            element={
+              <ErrorBoundary fallbackTitle="Acrylic Customizer Error">
+                <AcrylicCustomizerPage />
+              </ErrorBoundary>
+            }
+          />
           {/* Dedicated Full-Screen Canvas Customizer */}
-          <Route path="/customize/canvas/:productId" element={<CanvasCustomizerPage />} />
+          <Route
+            path="/customize/canvas/:productId"
+            element={
+              <ErrorBoundary fallbackTitle="Canvas Customizer Error">
+                <CanvasCustomizerPage />
+              </ErrorBoundary>
+            }
+          />
           {/* Dedicated Mobile QR Upload Page */}
           <Route path="/mobile-upload/:sessionId" element={<MobileUploadPage />} />
 

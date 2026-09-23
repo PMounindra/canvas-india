@@ -45,6 +45,7 @@ import {
   ACRYLIC_BORDER_WIDTHS,
   ACRYLIC_BORDER_COLORS
 } from '../data/acrylicCustomizerData';
+import { optimizeImageFile } from '../utils/imageOptimizer';
 
 // ============================================================================
 // 1. CONSTANTS & CANVAS-ONLY DATA DEFINITIONS
@@ -1001,24 +1002,25 @@ export const CanvasCustomizerPage: React.FC = () => {
 
   // File Upload Handler
   // Files go to the frame that asked for them; extra files fill the following frames, the rest just join the uploads tray.
-  const handleFilesUpload = (files: FileList | File[] | null, startIdx: number = uploadTargetRef.current) => {
+  const handleFilesUpload = async (files: FileList | File[] | null, startIdx: number = uploadTargetRef.current) => {
     if (!files || files.length === 0) return;
     const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/bmp'];
+    const fileList = Array.from(files);
 
-    Array.from(files).forEach((file, i) => {
+    for (let i = 0; i < fileList.length; i++) {
+      const file = fileList[i];
       if (file.size > 25 * 1024 * 1024) {
         alert(`File ${file.name} exceeds the 25MB limit.`);
-        return;
+        continue;
       }
       if (!validTypes.includes(file.type) && !file.name.match(/\.(jpg|jpeg|png|webp|bmp)$/i)) {
         alert(`File ${file.name} is not a supported format (JPG, PNG, WEBP, BMP).`);
-        return;
+        continue;
       }
 
-      const target = startIdx + i;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
+      try {
+        const target = startIdx + i;
+        const result = await optimizeImageFile(file);
         if (result) {
           setUploadedPhotos((prev) => [result, ...prev]);
           if (i === 0 || target < panels.length) {
@@ -1027,10 +1029,12 @@ export const CanvasCustomizerPage: React.FC = () => {
             setActivePanelIndex(idx);
           }
         }
-      };
-      reader.readAsDataURL(file);
-    });
+      } catch (err) {
+        console.error('Failed to process image file:', err);
+      }
+    }
   };
+
 
   const handleAssignPhotoToPanel = (photoUrl: string, panelIdx: number) => {
     setPanelImages((prev) => ({
