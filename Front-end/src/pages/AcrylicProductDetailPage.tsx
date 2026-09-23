@@ -71,10 +71,11 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
   const availablePapers = product.availablePapers || ['White Luster Photo Paper', 'Metallic Pearl Paper'];
   const availableBases = product.availableBases || ['Without Base', 'Acrylic Base', 'Solid Wood Base'];
 
-  const [selectedStyle, setSelectedStyle] = useState<string>(availableStyles[0]);
-  const [selectedThickness, setSelectedThickness] = useState<string>(availableThicknesses[0]);
-  const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0]);
-  const [selectedPaper, setSelectedPaper] = useState<string>(availablePapers[0]);
+  const [selectedStyle, setSelectedStyle] = useState<string>(availableStyles[0] || 'Block');
+  const [selectedThickness, setSelectedThickness] = useState<string>(availableThicknesses[0] || '7mm');
+  const [selectedSize, setSelectedSize] = useState<string>(availableSizes[0] || '4" x 4"');
+  const [selectedPaper, setSelectedPaper] = useState<string>(availablePapers[0] || 'White Luster Photo Paper');
+  const [selectedBase, setSelectedBase] = useState<string>(availableBases[0] || 'Without Base');
   const [quantity, setQuantity] = useState<number>(1);
 
   // Photo Upload & Custom Text state
@@ -191,15 +192,16 @@ export const AcrylicProductDetailPage: React.FC<AcrylicProductDetailPageProps> =
 
   // Dynamic Price Calculation
   const unitPrice = useMemo(() => {
-    let price = product.price;
+    let price = product.price || 999;
+    const sizeStr = selectedSize || '';
 
     // Size adjustment
-    if (selectedSize.includes('6" x 6"') || selectedSize.includes('5" x 7"') || selectedSize.includes('7" x 5"')) price += 200;
-    else if (selectedSize.includes('8" x 8"') || selectedSize.includes('8" x 10"') || selectedSize.includes('10" x 8"')) price += 450;
-    else if (selectedSize.includes('12" x 8"') || selectedSize.includes('8" x 12"') || selectedSize.includes('12" x 12"')) price += 700;
-    else if (selectedSize.includes('12" x 18"') || selectedSize.includes('16" x 24"')) price += 1100;
-    else if (selectedSize.includes('20" x 30"') || selectedSize.includes('24" x 36"') || selectedSize.includes('Set of 3')) price += 1800;
-    else if (selectedSize.includes('30" x 48"') || selectedSize.includes('36" x 60"')) price += 2600;
+    if (sizeStr.includes('6" x 6"') || sizeStr.includes('5" x 7"') || sizeStr.includes('7" x 5"')) price += 200;
+    else if (sizeStr.includes('8" x 8"') || sizeStr.includes('8" x 10"') || sizeStr.includes('10" x 8"')) price += 450;
+    else if (sizeStr.includes('12" x 8"') || sizeStr.includes('8" x 12"') || sizeStr.includes('12" x 12"')) price += 700;
+    else if (sizeStr.includes('12" x 18"') || sizeStr.includes('16" x 24"')) price += 1100;
+    else if (sizeStr.includes('20" x 30"') || sizeStr.includes('24" x 36"') || sizeStr.includes('Set of 3')) price += 1800;
+    else if (sizeStr.includes('30" x 48"') || sizeStr.includes('36" x 60"')) price += 2600;
 
     // Thickness adjustment
     if (selectedThickness === '18mm' || selectedThickness === '8mm' || selectedThickness === '10mm') {

@@ -28,6 +28,7 @@ import { ProductImage } from '../components/ProductImage';
 import { CUSTOMER_REVIEWS } from '../data/storeData';
 import { Product } from '../types';
 import { AcrylicProductDetailPage } from './AcrylicProductDetailPage';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 
 interface FinishStyle { wall: string; border: number; color: string; shadow: string; outline: string; overlay: string; }
 
@@ -248,7 +249,11 @@ export const ProductDetailPage: React.FC = () => {
  
   // Dedicated Acrylic Product Detail Page with Reference 1 layout & customizer drawer
   if (product.categorySlug === 'acrylic') {
-    return <AcrylicProductDetailPage product={product} />;
+    return (
+      <ErrorBoundary fallbackTitle="Acrylic Product Error">
+        <AcrylicProductDetailPage product={product} />
+      </ErrorBoundary>
+    );
   }
 
   const categoryName = product.category || 'Prints';
